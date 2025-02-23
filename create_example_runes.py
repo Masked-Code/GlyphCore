@@ -8,11 +8,11 @@ def create_runes():
 
     cure_wounds = get_cure_wounds()
     cure_wounds_rune_gen = RuneGenerator(cure_wounds)
-    cure_wounds_rune_gen.generate_rune("cure_wounds_rune_exmaple.png")
+    cure_wounds_rune_gen.generate_rune("cure_wounds_rune_example.png")
 
     wish = get_wish()
     cure_wounds_rune_gen = RuneGenerator(wish)
-    cure_wounds_rune_gen.generate_rune("wish_rune_exmaple.png")
+    cure_wounds_rune_gen.generate_rune("wish_rune_example.png")
 
     print(fireball)
     print("\n" + "-"*50 + "\n")
