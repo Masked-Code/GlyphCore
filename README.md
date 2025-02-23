@@ -1,8 +1,8 @@
-# GlyphCore
+# ✨ GlyphCore ✨
 
 GlyphCore is a Python tool that generates unique, monochrome runes representing spells from *Dungeons & Dragons* 5th Edition. Each rune visually encodes a spell’s properties—such as level, school of magic, damage type, casting time, range, duration, and components—into a stylized, black-and-white glyph. This project is ideal for D&D enthusiasts, game masters, or developers looking to create custom spell representations for campaigns, tools, or artwork.
 
-## Features
+## 🟢 Features
 
 - **Comprehensive Spell Model**: Encapsulates all D&D spell attributes (level, school, classes, components, etc.) in a `DnDSpell` class.
 - **Rune Generation**: The `RuneGenerator` class creates a visual rune for any spell, using shapes, patterns, and symbols to represent its properties:
@@ -15,12 +15,12 @@ GlyphCore is a Python tool that generates unique, monochrome runes representing 
   - **Components**: Edge icons (wave for Verbal, hand for Somatic, diamond for Material).
 - **Extensibility**: Supports adding new spells via hardcoded definitions or a JSON file.
 
-## Prerequisites
+## 🔴 Prerequisites
 
 - **Python 3.5+**: Required for `typing` and `enum` support.
 - **Pillow**: For image generation (`pip install Pillow` or `pip install -r requirements.txt`).
 
-## Installation
+## 🔵 Installation
 
 1. Clone the repository
 2. Ensure the prerequisites are fulfilled
