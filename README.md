@@ -27,6 +27,6 @@ GlyphCore is a Python tool that generates unique, monochrome runes representing 
 3. Install the required packages with `pip install -r requirements.txt`
 4. Run the program with `python3 main.py`
 
+![Alarm Rune](runes/alarm_rune_example.png)
 ![Fireball Rune](runes/fireball_rune_example.png)
-![Cure Wounds Rune](runes/cure_wounds_rune_example.png)
-![Wish Rune](runes/wish_rune_example.png)
+![Web Rune](runes/web_rune_example.png)

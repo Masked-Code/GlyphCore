@@ -3,7 +3,6 @@ from typing import List, Optional, Dict, Union
 from PIL import Image, ImageDraw
 import math
 
-# Enums for categorical data
 class SpellLevel(Enum):
     CANTRIP = 0
     LEVEL_1 = 1
@@ -103,7 +102,6 @@ class Metamagic(Enum):
     SUBTLE = "Subtle Spell"
     HEIGHTENED = "Heightened Spell"
 
-# Main DnDSpell class
 class DnDSpell:
     def __init__(
         self,
@@ -116,15 +114,15 @@ class DnDSpell:
         casting_time: CastingTimeType = CastingTimeType.ACTION,
         custom_casting_time: Optional[str] = None,
         range_type: RangeType = RangeType.SELF,
-        range_distance: Optional[int] = None,  # In feet, for Fixed range
+        range_distance: Optional[int] = None,
         duration_type: DurationType = DurationType.INSTANTANEOUS,
-        duration_time: Optional[str] = None,  # e.g., "1 minute", "8 hours"
-        targets: Optional[int] = None,  # Number of targets, None for AoE or self
+        duration_time: Optional[str] = None, 
+        targets: Optional[int] = None,
         aoe_type: AreaOfEffectType = AreaOfEffectType.NONE,
-        aoe_size: Optional[Dict[str, int]] = None,  # e.g., {"radius": 20} for sphere
+        aoe_size: Optional[Dict[str, int]] = None,
         damage_type: Optional[DamageType] = None,
-        damage_dice: Optional[str] = None,  # e.g., "3d6"
-        effect_role: Optional[str] = None,  # e.g., "Damage", "Healing", "Control"
+        damage_dice: Optional[str] = None,
+        effect_role: Optional[str] = None,
         is_ritual: bool = False,
         requires_attack_roll: bool = False,
         saving_throw: Optional[SavingThrowType] = None,
@@ -187,57 +185,54 @@ class DnDSpell:
         output += f"Source: {self.source_book}"
         return output
 
-# Shape mappings for schools of magic (number of sides)
 SCHOOL_SHAPES = {
-    SchoolOfMagic.ABJURATION: 4,      # Square
-    SchoolOfMagic.CONJURATION: 6,     # Hexagon
-    SchoolOfMagic.DIVINATION: 8,      # Octagon
-    SchoolOfMagic.ENCHANTMENT: 5,     # Pentagon
-    SchoolOfMagic.EVOCATION: 0,       # Circle (0 sides for simplicity)
-    SchoolOfMagic.ILLUSION: 7,        # Heptagon
-    SchoolOfMagic.NECROMANCY: 5,      # Pentagon (distinct from Enchantment)
-    SchoolOfMagic.TRANSMUTATION: 3    # Triangle
+    SchoolOfMagic.ABJURATION: 4,  
+    SchoolOfMagic.CONJURATION: 6, 
+    SchoolOfMagic.DIVINATION: 8,   
+    SchoolOfMagic.ENCHANTMENT: 5, 
+    SchoolOfMagic.EVOCATION: 0,    
+    SchoolOfMagic.ILLUSION: 7,
+    SchoolOfMagic.NECROMANCY: 5,  
+    SchoolOfMagic.TRANSMUTATION: 3
 }
 
 class RuneGenerator:
     def __init__(self, spell: DnDSpell):
         self.spell = spell
-        self.image_size = 800  # Increased from 400 to 800 for larger canvas
+        self.image_size = 800 
         self.center = (self.image_size // 2, self.image_size // 2)
-        self.base_radius = min(150 + (self.spell.range_distance or 0) // 5, 350)  # Increased from 50 base to 150, capped at 350
+        self.base_radius = min(150 + (self.spell.range_distance or 0) // 5, 350) 
 
     def draw_shape(self, draw: ImageDraw.Draw, sides: int):
         """Draw the base shape based on school of magic."""
-        if sides == 0:  # Circle for Evocation
+        if sides == 0: 
             draw.ellipse(
                 [self.center[0] - self.base_radius, self.center[1] - self.base_radius,
                  self.center[0] + self.base_radius, self.center[1] + self.base_radius],
-                outline="black", width=3  # Increased width for visibility
+                outline="black", width=3  
             )
-        else:  # Polygon for other schools
+        else:  
             angle_step = 360 / sides
             points = [
                 (self.center[0] + self.base_radius * math.cos(math.radians(angle_step * i)),
                  self.center[1] + self.base_radius * math.sin(math.radians(angle_step * i)))
                 for i in range(sides)
             ]
-            draw.polygon(points, outline="black", width=3)  # Increased width
+            draw.polygon(points, outline="black", width=3) 
 
     def draw_damage_pattern(self, draw: ImageDraw.Draw):
         """Draw a pattern inside the shape based on damage type."""
-        inner_radius = self.base_radius * 0.8  # Still proportional to larger base_radius
+        inner_radius = self.base_radius * 0.8 
         damage_type = self.spell.damage_type
 
         if damage_type == DamageType.ACID:
-            # Diagonal lines
-            for i in range(-int(inner_radius), int(inner_radius), 15):  # Increased step for larger scale
+            for i in range(-int(inner_radius), int(inner_radius), 15):
                 draw.line(
                     [self.center[0] + i, self.center[1] - inner_radius,
                      self.center[0] + i + inner_radius, self.center[1] + inner_radius],
-                    fill="black", width=2  # Thicker lines
+                    fill="black", width=2  
                 )
         elif damage_type == DamageType.FIRE:
-            # Small triangles
             for i in range(0, 360, 60):
                 angle = math.radians(i)
                 p1 = (self.center[0] + inner_radius * 0.5 * math.cos(angle),
@@ -248,17 +243,15 @@ class RuneGenerator:
                       self.center[1] + inner_radius * 0.7 * math.sin(angle - 0.2))
                 draw.polygon([p1, p2, p3], fill="black")
         elif damage_type == DamageType.COLD:
-            # Dotted fill
-            for x in range(-int(inner_radius), int(inner_radius), 15):  # Increased step
+            for x in range(-int(inner_radius), int(inner_radius), 15):
                 for y in range(-int(inner_radius), int(inner_radius), 15):
                     if math.sqrt(x**2 + y**2) < inner_radius:
                         draw.ellipse(
                             [self.center[0] + x - 3, self.center[1] + y - 3,
-                             self.center[0] + x + 3, self.center[1] + y + 3],  # Larger dots
+                             self.center[0] + x + 3, self.center[1] + y + 3],  
                             fill="black"
                         )
         elif damage_type == DamageType.LIGHTNING:
-            # Zigzag lines
             for i in range(0, 3):
                 angle = math.radians(i * 120)
                 start = (self.center[0] + inner_radius * 0.5 * math.cos(angle),
@@ -267,22 +260,20 @@ class RuneGenerator:
                        self.center[1] + inner_radius * 0.7 * math.sin(angle + 0.1))
                 end = (self.center[0] + inner_radius * math.cos(angle),
                        self.center[1] + inner_radius * math.sin(angle))
-                draw.line([start, mid, end], fill="black", width=2)  # Thicker lines
+                draw.line([start, mid, end], fill="black", width=2)
         elif damage_type == DamageType.FORCE:
-            # Concentric circles
-            for r in range(15, int(inner_radius), 15):  # Increased step
+            for r in range(15, int(inner_radius), 15):
                 draw.ellipse(
                     [self.center[0] - r, self.center[1] - r,
                      self.center[0] + r, self.center[1] + r],
-                    outline="black", width=2  # Thicker lines
+                    outline="black", width=2 
                 )
         elif damage_type == DamageType.NECROTIC:
-            # Crosshatch
-            for i in range(-int(inner_radius), int(inner_radius), 15):  # Increased step
+            for i in range(-int(inner_radius), int(inner_radius), 15):
                 draw.line(
                     [self.center[0] + i, self.center[1] - inner_radius,
                      self.center[0] + i + inner_radius, self.center[1] + inner_radius],
-                    fill="black", width=2  # Thicker lines
+                    fill="black", width=2 
                 )
                 draw.line(
                     [self.center[0] + i, self.center[1] + inner_radius,
@@ -293,92 +284,82 @@ class RuneGenerator:
     def draw_level_lines(self, draw: ImageDraw.Draw):
         """Draw radiating lines based on spell level."""
         if self.spell.level == SpellLevel.CANTRIP:
-            return  # No lines for cantrips
+            return 
         num_lines = self.spell.level.value
         angle_step = 360 / num_lines
         for i in range(num_lines):
             angle = math.radians(angle_step * i)
             start = (self.center[0] + self.base_radius * math.cos(angle),
                      self.center[1] + self.base_radius * math.sin(angle))
-            end = (self.center[0] + (self.base_radius + 40) * math.cos(angle),  # Longer lines
+            end = (self.center[0] + (self.base_radius + 40) * math.cos(angle), 
                    self.center[1] + (self.base_radius + 40) * math.sin(angle))
-            draw.line([start, end], fill="black", width=3)  # Thicker lines
+            draw.line([start, end], fill="black", width=3)  
 
     def draw_border(self, draw: ImageDraw.Draw):
         """Draw border style based on casting time."""
-        border_radius = self.base_radius + 20  # Increased offset
+        border_radius = self.base_radius + 20  
         if self.spell.casting_time == CastingTimeType.ACTION:
             draw.ellipse(
                 [self.center[0] - border_radius, self.center[1] - border_radius,
                  self.center[0] + border_radius, self.center[1] + border_radius],
-                outline="black", width=3  # Thicker border
+                outline="black", width=3 
             )
         elif self.spell.casting_time == CastingTimeType.REACTION:
-            # Dashed border
             for i in range(0, 360, 20):
                 start_angle = math.radians(i)
                 end_angle = math.radians(i + 10)
                 draw.arc(
                     [self.center[0] - border_radius, self.center[1] - border_radius,
                      self.center[0] + border_radius, self.center[1] + border_radius],
-                    start=i, end=i + 10, fill="black", width=3  # Thicker dashes
+                    start=i, end=i + 10, fill="black", width=3
                 )
 
     def draw_duration_symbol(self, draw: ImageDraw.Draw):
         """Draw a central symbol based on duration."""
         if self.spell.duration_type == DurationType.INSTANTANEOUS:
             draw.ellipse(
-                [self.center[0] - 10, self.center[1] - 10,  # Larger dot
+                [self.center[0] - 10, self.center[1] - 10,
                  self.center[0] + 10, self.center[1] + 10],
                 fill="black"
             )
         elif self.spell.duration_type == DurationType.CONCENTRATION:
-            # Larger spiral
             for i in range(0, 360, 10):
                 angle = math.radians(i)
-                r = i / 25  # Adjusted for larger scale
+                r = i / 25 
                 x = self.center[0] + r * math.cos(angle)
                 y = self.center[1] + r * math.sin(angle)
-                draw.ellipse([x - 2, y - 2, x + 2, y + 2], fill="black")  # Larger points
+                draw.ellipse([x - 2, y - 2, x + 2, y + 2], fill="black")
 
     def draw_components(self, draw: ImageDraw.Draw):
         """Draw small icons for components near the edge."""
         offset = 0
         for component in self.spell.components:
-            x = self.center[0] + (self.base_radius + 50) * math.cos(math.radians(offset))  # Further out
+            x = self.center[0] + (self.base_radius + 50) * math.cos(math.radians(offset))
             y = self.center[1] + (self.base_radius + 50) * math.sin(math.radians(offset))
             if component == Component.VERBAL:
-                draw.arc([x - 10, y - 10, x + 10, y + 10], 0, 180, fill="black", width=3)  # Larger wave
+                draw.arc([x - 10, y - 10, x + 10, y + 10], 0, 180, fill="black", width=3)
             elif component == Component.SOMATIC:
-                draw.polygon([(x, y - 10), (x - 10, y + 10), (x + 10, y + 10)], fill="black")  # Larger hand
+                draw.polygon([(x, y - 10), (x - 10, y + 10), (x + 10, y + 10)], fill="black") 
             elif component == Component.MATERIAL:
-                draw.rectangle([x - 10, y - 10, x + 10, y + 10], fill="black")  # Larger diamond
+                draw.rectangle([x - 10, y - 10, x + 10, y + 10], fill="black") 
             offset += 45
 
     def generate_rune(self, filename: str = "rune.png"):
         """Generate and save the monochrome rune image."""
-        image = Image.new("1", (self.image_size, self.image_size), 1)  # 1-bit monochrome (black/white)
+        image = Image.new("1", (self.image_size, self.image_size), 1) 
         draw = ImageDraw.Draw(image)
-
-        # Base shape (school of magic)
         sides = SCHOOL_SHAPES[self.spell.school]
         self.draw_shape(draw, sides)
 
-        # Damage pattern
         self.draw_damage_pattern(draw)
 
-        # Level lines
         self.draw_level_lines(draw)
 
-        # Casting time border
         self.draw_border(draw)
 
-        # Duration symbol
         self.draw_duration_symbol(draw)
 
-        # Components
         self.draw_components(draw)
 
-        # Save the image
         image.save(f"runes/{filename}")
         print(f"Monochrome rune saved as {filename}")

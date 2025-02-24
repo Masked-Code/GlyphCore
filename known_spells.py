@@ -169,7 +169,7 @@ def load_spells_from_json(file_path: str) -> List[DnDSpell]:
                 requires_attack_roll=spell.get("requires_attack_roll", False),
                 saving_throw=SavingThrowType[spell["saving_throw"]] if spell.get("saving_throw") else None,
                 spellcasting_ability=AbilityScore[spell["spellcasting_ability"]],
-                metamagic_options=None,  # Add if needed
+                metamagic_options=None, 
                 source_book=spell.get("source_book", "Player's Handbook")
             ))
         return spells

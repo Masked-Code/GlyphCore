@@ -8,7 +8,6 @@ from utils import (
     SavingThrowType, AbilityScore
 )
 
-# Set up logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -18,7 +17,6 @@ logging.basicConfig(
     ]
 )
 
-# Load JSON data with UTF-8 encoding
 def load_json(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -39,7 +37,6 @@ def load_json(file_path):
         logging.error(f"Unexpected error loading JSON: {e}")
         raise
 
-# Map JSON level to SpellLevel enum
 def get_spell_level(level_num, spell_name):
     level_map = {
         0: "CANTRIP",
@@ -59,7 +56,6 @@ def get_spell_level(level_num, spell_name):
         logging.error(f"Spell '{spell_name}': Invalid level value '{level_num}'. Expected 0-9.")
         raise ValueError(f"Invalid level: {level_num}")
 
-# Map JSON components to Component enum
 def get_components(components_str, material, spell_name):
     try:
         comps = []
@@ -76,7 +72,6 @@ def get_components(components_str, material, spell_name):
         logging.error(f"Spell '{spell_name}': Invalid components format '{components_str}'. Expected string.")
         raise ValueError(f"Invalid components: {components_str}")
 
-# Parse range and AoE with enhanced handling
 def parse_range(range_str, spell_name):
     try:
         range_str = range_str.strip().lower()
@@ -89,7 +84,7 @@ def parse_range(range_str, spell_name):
                 if match:
                     size_str = match.group(1).replace(" ", "").replace("radius", "")
                     size = int(size_str.replace("foot", "").replace("ft", "").replace("mile", ""))
-                    shape = match.group(2) or "sphere"  # Default to sphere if no shape
+                    shape = match.group(2) or "sphere" 
                     aoe_type = f"AreaOfEffectType.{shape.upper()}"
                     aoe_size = {"radius": size * 5280 if "mile" in size_str else size}
                 else:
@@ -129,7 +124,6 @@ def parse_range(range_str, spell_name):
         logging.error(f"Spell '{spell_name}': Error parsing range '{range_str}': {e}")
         raise
 
-# Parse casting time
 def parse_casting_time(casting_time_str, spell_name):
     try:
         casting_time_str = casting_time_str.strip().lower()
@@ -147,7 +141,6 @@ def parse_casting_time(casting_time_str, spell_name):
         logging.error(f"Spell '{spell_name}': Error parsing casting time '{casting_time_str}': {e}")
         raise ValueError(f"Invalid casting time: {casting_time_str}")
 
-# Parse duration
 def parse_duration(duration_str, spell_name):
     try:
         duration_str = duration_str.strip()
@@ -165,7 +158,6 @@ def parse_duration(duration_str, spell_name):
         logging.error(f"Spell '{spell_name}': Error parsing duration '{duration_str}': {e}")
         raise ValueError(f"Invalid duration: {duration_str}")
 
-# Infer effect role, damage type, damage dice, and saving throw from description
 def infer_spell_details(desc, spell_name):
     try:
         desc = desc.lower()
@@ -211,7 +203,6 @@ def infer_spell_details(desc, spell_name):
         logging.error(f"Spell '{spell_name}': Error inferring details from description: {e}")
         raise
 
-# Convert spell to function string with detailed error handling
 def spell_to_function(spell):
     spell_name = spell.get("name", "Unknown")
     try:
@@ -288,7 +279,6 @@ def spell_to_function(spell):
         logging.error(f"Spell '{spell_name}': Unexpected error: {e}")
         return None
 
-# Generate class-specific spell files with error tolerance
 def generate_class_files(spell_data):
     imports = """from utils import (
     DnDSpell, SpellLevel, SchoolOfMagic, SpellcastingClass, Component,
@@ -326,7 +316,6 @@ def generate_class_files(spell_data):
     else:
         logging.info("All spells processed successfully")
 
-# Main execution
 if __name__ == "__main__":
     try:
         spell_data = load_json("spells.json")
@@ -339,4 +328,4 @@ if __name__ == "__main__":
     except ValueError as e:
         logging.error(f"Value error: {e}")
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}", exc_info=True)  # Include stack trace
+        logging.error(f"An unexpected error occurred: {e}", exc_info=True) 
